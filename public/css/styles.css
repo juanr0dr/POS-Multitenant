@@ -1,0 +1,95 @@
+:root { --primary-blue: #0a66c2; --input-border: #00000099; }
+body { font-family: -apple-system, system-ui, sans-serif; }
+.tracking-wide { letter-spacing: 1px; }
+
+/* Estilos Auth */
+body.auth-body { background-color: #f3f2ef !important; min-height: 100vh; }
+.text-primary-custom { color: var(--primary-blue) !important; }
+.btn-primary-custom { background-color: var(--primary-blue); color: white; }
+.custom-input { height: 48px; border: 1px solid var(--input-border); border-radius: 4px; }
+
+/* ========================================== */
+/* ESTILOS MAPA DE MESAS                      */
+/* ========================================== */
+.restaurant-table {
+    width: 140px; height: 140px; border-radius: 12px; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; cursor: pointer; color: white;
+    font-weight: bold; font-size: 1.2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    transition: transform 0.1s; border: 3px solid rgba(255,255,255,0.1);
+}
+.restaurant-table:active { transform: scale(0.95); }
+.table-free { background-color: #198754; }
+.table-occupied { background-color: #dc3545; }
+.table-pending { background-color: #ffc107; color: #000; }
+.table-amount { font-size: 0.9rem; font-weight: normal; margin-top: 5px; }
+
+/* ========================================== */
+/* ESTILOS TERMINAL POS                       */
+/* ========================================== */
+.bg-simphony-base { background-color: #1e1e1e !important; }
+.bg-simphony-dark { background-color: #121212 !important; }
+.bg-simphony-main { background-color: #252526 !important; }
+.bg-simphony-pay { background-color: #2b5c6b !important; }
+
+.simphony-cat-btn {
+    border-radius: 0; color: #cccccc; font-weight: 600; font-size: 1.1rem;
+    padding: 15px 0; border: none; border-right: 1px solid #333;
+}
+.simphony-cat-btn.active { background-color: #4a6b8c; color: white; }
+
+.simphony-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 8px; }
+
+.simphony-item-btn {
+    background-color: #2d6b7a; color: white; border: 1px solid #1e1e1e; border-radius: 3px;
+    height: 90px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center; font-weight: bold; cursor: pointer; user-select: none;
+}
+.simphony-item-btn:active { transform: scale(0.96); }
+
+.simphony-func-btn {
+    background-color: #333333; color: #e0e0e0; border-radius: 2px;
+    font-weight: 600; padding: 15px 0; border: 1px solid #444; font-size: 1rem;
+}
+
+.ticket-item-row { cursor: pointer; border-bottom: 1px solid #333; }
+.ticket-item-row.selected > td { background-color: #0d47a1 !important; color: white !important; }
+
+/* ========================================== */
+/* ESTILOS PANTALLA DE PAGO (NUMPAD)          */
+/* ========================================== */
+.numpad-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    max-width: 320px;
+    width: 100%;
+}
+
+.numpad-btn {
+    background-color: #e0e0e0;
+    color: #000;
+    font-size: 1.8rem;
+    font-weight: bold;
+    border-radius: 4px;
+    height: 70px;
+    border: 1px solid #ccc;
+    box-shadow: inset -1px -2px 0px rgba(0,0,0,0.2);
+}
+
+.numpad-btn:active {
+    background-color: #b0b0b0;
+    box-shadow: inset 1px 2px 0px rgba(0,0,0,0.3);
+}
+
+.payment-sidebar-btn {
+    background-color: #354a5f;
+    border: 1px solid #202c38;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    transition: background-color 0.1s;
+}
+
+.payment-sidebar-btn:active {
+    background-color: #1e2c3a;
+}

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simphony POS Clone - Workstation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body class="bg-simphony-base text-white">
+
+    <!-- HEADER -->
+    <div class="d-flex justify-content-between align-items-center px-3 py-2 bg-black border-bottom border-secondary">
+        <div class="fw-bold fs-5 tracking-wide"><i class="bi bi-display me-2 text-info"></i>SAAS POS WORKSTATION</div>
+        <div id="tenantNameDisplay" class="text-info fw-semibold text-uppercase tracking-wide">Cargando...</div>
+        <div class="d-flex align-items-center gap-3">
+            <span id="currentTime" class="fw-bold fs-5">00:00:00</span>
+            <button class="btn btn-sm btn-outline-secondary text-white" id="logoutBtn"><i class="bi bi-power"></i> Sign Out</button>
+        </div>
+    </div>
+
+    <!-- MÓDULO 1: MAPA DE MESAS (FLOOR PLAN) -->
+    <div id="floorPlanSection" class="container-fluid py-4" style="height: calc(100vh - 46px); overflow-y: auto;">
+        <div class="d-flex justify-content-between align-items-center mb-4 px-3">
+            <h3 class="fw-bold m-0">Floor Plan (Main Dining)</h3>
+            <div class="d-flex gap-3">
+                <span class="badge bg-success py-2 px-3">Libre</span>
+                <span class="badge bg-danger py-2 px-3">Ocupada</span>
+                <span class="badge bg-warning text-dark py-2 px-3">Impresa (Cobro)</span>
+                <button class="btn btn-sm btn-dark border-secondary ms-3" data-bs-toggle="modal" data-bs-target="#adminModal"><i class="bi bi-gear"></i> Admin</button>
+            </div>
+        </div>
+        <div id="tableGrid" class="d-flex flex-wrap gap-4 justify-content-center p-3">
+            <!-- Renderizado por JS -->
+        </div>
+    </div>
+
+    <!-- MÓDULO 2: PUNTO DE VENTA (TICKET Y TERMINAL) -->
+    <div id="posSection" class="container-fluid px-0" style="display: none; height: calc(100vh - 46px);">
+        <div class="row g-0 h-100">
+            
+            <!-- PANEL IZQ: TICKET -->
+            <div class="col-12 col-md-4 col-xl-4 d-flex flex-column border-end border-secondary bg-simphony-dark">
+                <div class="p-2 border-bottom border-secondary d-flex justify-content-between align-items-center bg-black">
+                    <div>
+                        <div class="fw-bold fs-5 text-white" id="currentTableName">Table X</div>
+                        <small class="text-info" id="currentCheckId">CHK-000</small>
+                    </div>
+                    <button class="btn btn-sm btn-outline-info" onclick="returnToMap()"><i class="bi bi-arrow-left"></i> Exit</button>
+                </div>
+
+                <div class="flex-grow-1 overflow-auto bg-simphony-main" id="ticketItemsContainer" style="font-family: 'Courier New', Courier, monospace; font-size: 1.1rem;">
+                    <table class="table table-sm table-borderless text-white mb-0" style="margin-bottom: 0;">
+                        <tbody id="ticketBody">
+                            <!-- Items -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="p-3 bg-black border-top border-secondary">
+                    <div class="d-flex justify-content-between mb-1 text-secondary">
+                        <span>Subtotal</span><span id="ticketSubtotal">0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-end mt-2">
+                        <span class="fs-5 text-white">Total Due</span>
+                        <span class="fs-2 fw-bold text-white" id="ticketTotal">0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PANEL DER: ÁREA DINÁMICA -->
+            <div class="col-12 col-md-8 col-xl-8 bg-simphony-base position-relative">
+                
+                <!-- SUB-MODO: ORDEN (Categorías y Productos) -->
+                <div id="orderModeLayout" class="d-flex flex-column h-100">
+                    <div class="d-flex bg-black border-bottom border-secondary" id="categoryNav">
+                        <button class="btn simphony-cat-btn flex-fill active" onclick="filterCategory('Food')">Food</button>
+                        <button class="btn simphony-cat-btn flex-fill" onclick="filterCategory('Drinks')">Drinks</button>
+                        <button class="btn simphony-cat-btn flex-fill" onclick="filterCategory('Desserts')">Desserts</button>
+                    </div>
+
+                    <div class="flex-grow-1 p-2 overflow-auto">
+                        <div id="posProductGrid" class="simphony-grid"></div>
+                    </div>
+
+                    <div class="d-flex bg-black p-2 gap-2 border-top border-secondary">
+                        <button class="btn simphony-func-btn flex-fill text-danger" onclick="voidItem()">Void Item</button>
+                        <button class="btn simphony-func-btn flex-fill text-info" onclick="saveCheck('Abierta')">Save (Kitchen)</button>
+                        <button class="btn simphony-func-btn flex-fill text-warning" onclick="saveCheck('Pendiente')">Print Bill</button>
+                        <!-- AQUI CAMBIAMOS LA FUNCIÓN A openPaymentScreen() -->
+                        <button class="btn simphony-func-btn flex-fill bg-simphony-pay text-white fw-bold" onclick="openPaymentScreen()"><i class="bi bi-credit-card me-2"></i>Pay & Close</button>
+                    </div>
+                </div>
+
+                <!-- SUB-MODO: PAGO (Numpad y Métodos) -->
+                <div id="paymentModeLayout" class="d-none flex-column h-100 bg-simphony-main">
+                    <!-- Cabecera Pago -->
+                    <div class="bg-black p-3 border-bottom border-secondary d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0 text-white tracking-wide">Send / Pay</h4>
+                        <button class="btn btn-outline-danger btn-sm" onclick="cancelPayment()">Cancel</button>
+                    </div>
+
+                    <!-- Cuerpo Pago -->
+                    <div class="row g-0 flex-grow-1">
+                        <!-- Centro: Numpad y Amount -->
+                        <div class="col-8 d-flex flex-column align-items-center justify-content-center p-4 border-end border-secondary">
+                            
+                            <div class="mb-4 w-100 px-4">
+                                <label class="text-secondary mb-1">Amount Tendered</label>
+                                <input type="text" id="paymentAmountInput" class="form-control form-control-lg bg-dark text-success fw-bold text-end fs-2 border-secondary" readonly>
+                            </div>
+
+                            <div class="numpad-container">
+                                <button class="btn numpad-btn" onclick="numpadType('7')">7</button>
+                                <button class="btn numpad-btn" onclick="numpadType('8')">8</button>
+                                <button class="btn numpad-btn" onclick="numpadType('9')">9</button>
+                                <button class="btn numpad-btn" onclick="numpadType('4')">4</button>
+                                <button class="btn numpad-btn" onclick="numpadType('5')">5</button>
+                                <button class="btn numpad-btn" onclick="numpadType('6')">6</button>
+                                <button class="btn numpad-btn" onclick="numpadType('1')">1</button>
+                                <button class="btn numpad-btn" onclick="numpadType('2')">2</button>
+                                <button class="btn numpad-btn" onclick="numpadType('3')">3</button>
+                                <button class="btn numpad-btn" onclick="numpadType('0')">0</button>
+                                <button class="btn numpad-btn" onclick="numpadType('00')">00</button>
+                                <button class="btn numpad-btn" onclick="numpadType('.')">.</button>
+                            </div>
+                            <div class="d-flex w-100 px-4 mt-3 gap-2" style="max-width: 320px;">
+                                <button class="btn btn-secondary flex-fill fw-bold py-3" onclick="numpadClear()">Clear</button>
+                                <button class="btn btn-secondary flex-fill fw-bold py-3" onclick="alert('Enter no funcional en demo')">Enter</button>
+                            </div>
+                        </div>
+
+                        <!-- Derecha: Métodos de Pago -->
+                        <div class="col-4 bg-simphony-dark d-flex flex-column p-2 gap-2">
+                            <div class="text-center text-secondary mb-2 small fw-bold text-uppercase mt-2">Payment Methods</div>
+                            
+                            <button class="btn payment-sidebar-btn flex-fill text-white bg-success border-0" onclick="finalizePayment('Efectivo')">
+                                <i class="bi bi-cash-stack d-block fs-3 mb-1"></i> Cash
+                            </button>
+                            
+                            <button class="btn payment-sidebar-btn flex-fill text-white" onclick="finalizePayment('Credit')">
+                                <i class="bi bi-credit-card-2-front d-block fs-3 mb-1"></i> Credit Card
+                            </button>
+                            
+                            <button class="btn payment-sidebar-btn flex-fill text-white" onclick="finalizePayment('Debit')">
+                                <i class="bi bi-credit-card d-block fs-3 mb-1"></i> Debit Card
+                            </button>
+                            
+                            <button class="btn payment-sidebar-btn flex-fill text-white" onclick="finalizePayment('GiftCard')">
+                                <i class="bi bi-gift d-block fs-3 mb-1"></i> SPI Gift
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Admin -->
+    <div class="modal fade" id="adminModal" tabindex="-1" data-bs-theme="dark">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark text-white">
+                <div class="modal-header border-secondary"><h5 class="modal-title">Add Item</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body">
+                    <form id="newProductForm">
+                        <input type="text" id="prodName" class="form-control mb-2" placeholder="Item Name" required>
+                        <select id="prodCat" class="form-select mb-2" required><option value="Food">Food</option><option value="Drinks">Drinks</option><option value="Desserts">Desserts</option></select>
+                        <input type="number" id="prodPrice" class="form-control mb-3" placeholder="Price ($)" step="0.01" required>
+                        <button type="submit" class="btn btn-info w-100 fw-bold">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>
