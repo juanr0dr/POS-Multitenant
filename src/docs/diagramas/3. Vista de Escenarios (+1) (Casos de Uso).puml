@@ -1,0 +1,13 @@
+@startuml Diagrama 3
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Mesero" as M
+
+rectangle "Sistema POS" {
+  M -- (Abrir mesa)
+  M -- (Registrar pedido)
+  M -- (Realizar Void)
+  M -- (Realizar Pago)
+}
+@enduml

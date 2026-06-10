@@ -1,0 +1,13 @@
+@startuml Diagrama 2
+actor Mesero
+participant "POS UI" as UI
+participant "Backend" as API
+database "MongoDB" as DB
+
+Mesero -> UI: Clic "Pay & Close"
+UI -> API: PUT /api/orders/:id
+API -> DB: updateOrder(status='Pagada')
+DB --> API: Success
+API --> UI: 200 OK
+UI -> UI: returnToMap()
+@enduml

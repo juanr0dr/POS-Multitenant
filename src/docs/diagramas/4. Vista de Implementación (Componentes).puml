@@ -1,0 +1,17 @@
+@startuml Vista de Implementación (Diagrama de Componentes)
+package "Frontend (Vercel)" {
+  [dashboard.html]
+  [dashboard.js]
+  [styles.css]
+}
+
+package "Backend (Express)" {
+  [routes]
+  [controllers]
+  [models]
+}
+
+[dashboard.js] --> [routes] : Fetch API (JSON)
+[routes] --> [controllers]
+[controllers] --> [models]
+@enduml

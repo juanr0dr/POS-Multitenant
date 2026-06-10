@@ -1,0 +1,23 @@
+@startuml Diagrama 1
+class Tenant {
+  + String storeName
+  + String adminEmail
+}
+
+class Product {
+  + String name
+  + String category
+  + Number price
+  + Number stock
+}
+
+class Order {
+  + String tableName
+  + String checkNumber
+  + Number totalAmount
+  + String status
+}
+
+Tenant "1" -- "N" Product : posee
+Tenant "1" -- "N" Order : registra
+@enduml

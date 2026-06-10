@@ -1,0 +1,18 @@
+@startuml  Diagramas
+node "Navegador Cliente" {
+  [Interfaz Web]
+}
+
+node "Vercel Cloud" {
+  [Servidor Express (API)]
+  [Archivos Estáticos]
+}
+
+database "MongoDB Atlas" {
+  [Base de Datos]
+}
+
+[Interfaz Web] --> [Archivos Estáticos] : HTTPS
+[Interfaz Web] --> [Servidor Express (API)] : HTTP/REST
+[Servidor Express (API)] --> [Base de Datos] : MONGODB URI
+@enduml
